@@ -10,8 +10,6 @@
 #import "RSMWebRequestManager.h"
 #import "URLs.h"
 
-#define SCRIPT_URL @"https://script.google.com/macros/s/AKfycbyH2NyHcbjhBa6mNFPj5rQ9BgvNZ4hKdZmkXWTdCrQFpbwvEKo/exec?id=0AkIjNxyzqN0_dFFWa2VCdnVOaDFvNmNoTEVaWDhoNHc&sheet=Summary"
-
 
 @implementation Brother
 
@@ -23,7 +21,8 @@
     
     if (self && [RSMWebRequestManager doesHaveInternetConnection]) {
         // Pull brotherhood data
-        NSData *jsonData = [RSMWebRequestManager dataFromUrlString:BROTHER_DATA_JSON];
+        NSString *url = [URLs brotherScriptUrlWithFirstName:fName lastName:lName];
+        NSData *jsonData = [RSMWebRequestManager dataFromUrlString:url];
         NSError *jsonError;
         NSDictionary *sheetJson = [NSJSONSerialization JSONObjectWithData:jsonData options:0 error:&jsonError];
         

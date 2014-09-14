@@ -10,10 +10,11 @@
 #import "RSMWebRequestManager.h"
 #import "URLs.h"
 
+#define RgbUIColor(r, g, b)  [UIColor colorWithRed:((r) / 255.0) green:((g) / 255.0) blue:((b) / 255.0) alpha:1.0]
+
 @interface LoginViewController ()
 
 // Properties
-@property (strong, nonatomic) IBOutlet __block FBProfilePictureView *profilePictureView;
 @property (strong, nonatomic) IBOutlet UILabel *nameLabel;
 @property (strong, nonatomic) IBOutlet UILabel *statusLabel;
 @property (nonatomic, strong) IBOutlet UIButton *logoutButton;
@@ -21,7 +22,6 @@
 // Instance Methods
 - (IBAction)displayAbout:(id)sender;
 - (IBAction)promptForPassword:(id)sender;
-- (void)centerNameLabel;
 - (void)continueToApp;
 - (void)raiseNoInternetAlert;
 
@@ -29,61 +29,31 @@
 
 @implementation LoginViewController
 
+static NSString *FIRST_NAME_KEY = @"first_name";
+static NSString *LAST_NAME_KEY  = @"last_name";
+static NSString *PASSWORD_CORRECT = @"password_correct";
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
     if (![RSMWebRequestManager doesHaveInternetConnection]) {
-        
-        // Center label when there's no profile picture.
-        [self centerNameLabel];
-        
         // Display alert
         [self raiseNoInternetAlert];
+    } else if ([[self class] loginComplete]) {
+        [self continueToApp];
     }
-}
-
-- (void)centerNameLabel
-{
-    _nameLabel.frame = CGRectOffset(_nameLabel.frame, (self.view.center.x - (_nameLabel.frame.size.width / 2)), 5);
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    [[UIApplication sharedApplication] setStatusBarHidden:NO];
     
-    // Set the profile picture view if we're logged into Facebook.
-    if (FBSession.activeSession.state != FBSessionStateClosedLoginFailed) {
-        
-        // Open a new session if the last auth token expired.
-        if (!FBSession.activeSession.isOpen) {
-            [FBSession openActiveSessionWithAllowLoginUI:NO];
-        }
-        
-        // Request user's profile id and set the ProfilePictureView
-        [FBRequestConnection startForMeWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
-            if (!error) {
-                // Success! Include your code to handle the results here
-                [_profilePictureView setProfileID:[result id]];
-            } else {
-                // An error occurred, we need to handle the error
-                // See: https://developers.facebook.com/docs/ios/errors
-                NSLog(@"LoginViewController: %@", error);
-                
-                // Center label when there's no profile picture.
-                [self centerNameLabel];
-                [_profilePictureView setProfileID:nil];
-            }
-        }];
-    } else {
-        [_profilePictureView setProfileID:nil];
-    }
-    
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"first_name"]) {
-        NSString *firstName = [[NSUserDefaults standardUserDefaults] objectForKey:@"first_name"],
-                 *lastName  = [[NSUserDefaults standardUserDefaults] objectForKey:@"last_name"];
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    NSString *firstName;
+    if ((firstName = [prefs objectForKey:FIRST_NAME_KEY])) {
+        // If we're already logged in, update the name label.
+        NSString *lastName  = [prefs objectForKey:LAST_NAME_KEY];
         
         [_nameLabel setText:[NSString stringWithFormat:@"%@ %@", firstName, lastName]];
         [_statusLabel setText:@"Welcome, Brother."];
@@ -93,8 +63,8 @@
         [_nameLabel setText:@""];
         [_statusLabel setText:@"Please log in to continue."];
         
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"password_correct"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+        [prefs removeObjectForKey:PASSWORD_CORRECT];
+        [prefs synchronize];
         _logoutButton.userInteractionEnabled = NO;
     }
 }
@@ -125,9 +95,7 @@
 
 - (IBAction)promptForPassword:(id)sender
 {
-    if (![[NSUserDefaults standardUserDefaults] objectForKey:@"first_name"]) {
-        [self performSegueWithIdentifier:@"SignInSegue" sender:self];
-    } else if (![[NSUserDefaults standardUserDefaults] objectForKey:@"password_correct"]) {
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:@"password_correct"]) {
         UIAlertView *passwordPrompt =
         [[UIAlertView alloc] initWithTitle:@"Enter Password"
                                    message:@"Please enter the chapter app password:"
@@ -136,9 +104,18 @@
                          otherButtonTitles:@"Submit", nil];
         [passwordPrompt setAlertViewStyle:UIAlertViewStylePlainTextInput];
         [passwordPrompt show];
+    } else if (![[NSUserDefaults standardUserDefaults] objectForKey:FIRST_NAME_KEY]) {
+        [self performSegueWithIdentifier:@"SignInSegue" sender:self];
     } else {
         [self continueToApp];
     }
+}
+
++ (BOOL)loginComplete
+{
+    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+    return [prefs objectForKey:FIRST_NAME_KEY] && [prefs objectForKey:@"last_name"]
+    && [prefs boolForKey:@"password_correct"];
 }
 
 - (void)raiseNoInternetAlert
@@ -158,10 +135,10 @@
         // Try to validate the password.
         if ([[[alertView textFieldAtIndex:0] text] isEqualToString:APP_PASSWORD]) {
             // Remember that the password was correct so we don't have to enter it again.
-            [[NSUserDefaults standardUserDefaults] setValue:@"password_correct"
-                                                     forKey:@"password_correct"];
+            [[NSUserDefaults standardUserDefaults] setBool:YES
+                                                    forKey:PASSWORD_CORRECT];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            [self continueToApp];
+            [self performSegueWithIdentifier:@"SignInSegue" sender:self];
         } else {
             UIAlertView *incorrectPasswordAlert =
             [[UIAlertView alloc] initWithTitle:@"Incorrect Password"
@@ -173,6 +150,30 @@
         }
     } else if ([[alertView title] isEqualToString:@"Incorrect Password"] && buttonIndex == 1) {
         [self promptForPassword:nil];
+    }
+}
+
++ (UIImage *)imageWithColor:(UIColor *)color
+{
+    CGRect rect = CGRectMake(0.0f, 0.0f, 1.0f, 1.0f);
+    UIGraphicsBeginImageContext(rect.size);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    
+    CGContextSetFillColorWithColor(context, [color CGColor]);
+    CGContextFillRect(context, rect);
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return image;
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    // Via http://stackoverflow.com/questions/18795117/change-tab-bar-tint-color-ios-7
+    if ([[segue identifier] isEqualToString:@"LoginCompleteSegue"]) {
+        UITabBarController *tabBarController = [segue destinationViewController];
+        tabBarController.tabBar.tintColor = RgbUIColor(0, 87, 155);
     }
 }
 

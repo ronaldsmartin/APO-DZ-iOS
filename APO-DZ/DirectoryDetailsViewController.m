@@ -14,9 +14,6 @@
 @interface DirectoryDetailsViewController ()
 
 // Display Outlets
-@property (nonatomic, strong) IBOutlet UILabel *nameLabel;
-@property (nonatomic, strong) IBOutlet UILabel *emailLabel;
-@property (nonatomic, strong) IBOutlet UILabel *phoneLabel;
 @property (nonatomic, strong) IBOutlet UILabel *yearLabel;
 @property (nonatomic, strong) IBOutlet UILabel *classLabel;
 @property (nonatomic, strong) IBOutlet UILabel *majorLabel;
@@ -46,7 +43,7 @@ static NSString *lNameKey = @"Last_Name",
                 *pNameKey = @"Preferred_Name",
                 *emailKey = @"Email_Address",
                 *phoneKey = @"Phone_Number",
-                *yearKey  = @"Expected_Graduation_Year",
+                *yearKey  = @"Graduation_Year",
                 *classKey = @"Pledge_Class",
                 *majorKey = @"Major";
 
@@ -54,52 +51,33 @@ static NSString *lNameKey = @"Last_Name",
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    
     // Get strings for labels.
-    NSString *fNameKey  = [[_brotherDetails objectForKey:pNameKey] isEqualToString:@""] ?  @"First_Name" : pNameKey,
-             *firstName = [_brotherDetails objectForKey:fNameKey],
-             *lastName  = [_brotherDetails objectForKey:lNameKey],
+    NSString *fNameKey  =
+        [_brotherDetails[pNameKey] isEqualToString:@""] ? @"First_Name" : pNameKey;
+    
+    NSString *firstName = _brotherDetails[fNameKey],
+             *lastName  = _brotherDetails[lNameKey],
              *brotherName = [NSString stringWithFormat:@"%@ %@", firstName, lastName];
+    
+    [self.navigationItem setTitle:brotherName];
+    
+    NSString *yearString =
+        [NSString stringWithFormat:@"    %@", [_brotherDetails[yearKey] stringValue]];
+    NSString *pledgeClassString =
+        [NSString stringWithFormat:@"    %@", _brotherDetails[classKey]];
     NSString *phoneNumberString =
-        [[_brotherDetails objectForKey:phoneKey] respondsToSelector:@selector(stringValue)] ? [[_brotherDetails objectForKey:phoneKey] stringValue] : [_brotherDetails objectForKey:phoneKey];
+        [_brotherDetails[phoneKey] respondsToSelector:@selector(stringValue)] ?
+        [_brotherDetails[phoneKey] stringValue] : _brotherDetails[phoneKey];
     
     // Fill in labels.
-    [_nameLabel  setText:brotherName];
-    [_emailLabel setText:[_brotherDetails  objectForKey:emailKey]];
-    [_phoneLabel setText:phoneNumberString];
-    [_yearLabel  setText:[[_brotherDetails objectForKey:yearKey]  stringValue]];
-    [_classLabel setText:[_brotherDetails  objectForKey:classKey]];
-    [_majorLabel setText:[_brotherDetails  objectForKey:majorKey]];
+    [_emailButton setTitle:_brotherDetails[emailKey] forState:UIControlStateNormal];
+    [_phoneButton setTitle:phoneNumberString forState:UIControlStateNormal];
+    [_yearLabel  setText:yearString];
+    [_classLabel setText:pledgeClassString];
+    [_majorLabel setText:_brotherDetails[majorKey]];
     
-    // Try to acquire and display the FB profile picture.
-    FBRequest *friendsRequest = [FBRequest requestForMyFriends];
-    [friendsRequest startWithCompletionHandler: ^(FBRequestConnection *connection,
-                                                  NSDictionary* result,
-                                                  NSError *error) {
-        for (NSDictionary *friend in [result objectForKey:@"data"]) {
-            if ([[friend objectForKey:@"last_name"] isEqualToString:lastName]
-                && [[friend objectForKey:@"first_name"] isEqualToString:firstName]) {
-                [_profilePictureView setProfileID:[friend objectForKey:@"id"]];
-                break;
-            }
-        }
-    }];
-    
-    // Disable buttons if functionality is not present.
-    if (![MFMailComposeViewController canSendMail]) {
-        [_emailButton setEnabled:NO];
-        [_emailButton setHidden:YES];
-    }
-    
-    if (![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"sms:816-373-8667"]]) {
-        [_textButton setEnabled:NO];
-        [_textButton setHidden:YES];
-    }
-    
-    if (![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"telprompt://816-373-8667"]]) {
-        [_phoneButton setEnabled:NO];
-        [_phoneButton setHidden:YES];
-    }
+    [self initProfilePicWithLastName:lastName firstName:firstName];
+    [self initButtons];
 }
 
 - (void)didReceiveMemoryWarning
@@ -148,10 +126,43 @@ static NSString *lNameKey = @"Last_Name",
     // Set up the message view and controller.
     MFMailComposeViewController *mc = [[MFMailComposeViewController alloc] init];
     [mc setMailComposeDelegate:self];
-    [mc setToRecipients:[NSArray arrayWithObject:[_brotherDetails objectForKey:emailKey]]];
+    [mc setToRecipients:@[_brotherDetails[emailKey]]];
     
     // Activate the view.
     [self presentViewController:mc animated:YES completion:nil];
+}
+
+- (void)initProfilePicWithLastName:(NSString *)lastName firstName:(NSString *)firstName
+{
+    // Try to acquire and display the FB profile picture.
+    FBRequest *friendsRequest = [FBRequest requestForMyFriends];
+    [friendsRequest startWithCompletionHandler: ^(FBRequestConnection *connection,
+                                                  NSDictionary* result,
+                                                  NSError *error) {
+        for (NSDictionary *friend in [result objectForKey:@"data"]) {
+            if ([[friend objectForKey:@"last_name"] isEqualToString:lastName]
+                && [[friend objectForKey:@"first_name"] isEqualToString:firstName]) {
+                [_profilePictureView setProfileID:[friend objectForKey:@"id"]];
+                break;
+            }
+        }
+    }];
+}
+
+- (void)initButtons
+{
+    // Disable buttons if functionality is not present.
+    if (![MFMailComposeViewController canSendMail]) {
+        [_emailButton setEnabled:NO];
+    }
+    
+    if (![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"sms:816-373-8667"]]) {
+        [_textButton setEnabled:NO];
+    }
+    
+    if (![[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"telprompt://816-373-8667"]]) {
+        [_phoneButton setEnabled:NO];
+    }
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller

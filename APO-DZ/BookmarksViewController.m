@@ -52,15 +52,16 @@
         Food Groups
     }
     Reporting {
-        Service Reporting
-        Fellowship Service Reflection
-        Fellowship Hosting
-        Fellowship Reporting
-        Merit-Demerit
-        Big-Little
-        Food Groups
-        Study Groups
-        Reimbursements
+        Report a project
+        Reflect on service
+        Create a fellowship
+        Report your fellowship
+        Give a (de-)merit
+        Report big-little hangout
+        Report your food group
+        Send a shoutout
+        Request a reimbursement
+        Tell Board
     }
     General {
         National Website
@@ -85,26 +86,17 @@
     return 4;
 }
 
-/*------------------------> TABLE SECTION HEADERS <------------------------*/
+#pragma mark Table view headers
 
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    // Generate header view programatically.
-    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 320, HEADER_HEIGHT)];
-    
-    [headerLabel setTextAlignment:NSTextAlignmentCenter];
-    [headerLabel setBackgroundColor:[UIColor blackColor]];
-    [headerLabel setTextColor:RgbUIColor(221, 174, 51)];
-    [headerLabel setFont:[UIFont fontWithName:@"Futura-CondensedMedium" size:17.0]];
-    
-    // Change the text displayed in the header label.
     static NSString *headerTitle;
     switch (section) {
         case 0:
-            headerTitle = @"Sheets";
+            headerTitle = @"Reporting Forms";
             break;
         case 1:
-            headerTitle = @"Reporting Forms";
+            headerTitle = @"Sheets";
             break;
         case 2:
             headerTitle = @"General";
@@ -113,17 +105,10 @@
             headerTitle = @"Social Media";
             break;
     }
-    [headerLabel setText:headerTitle];
-    
-    return headerLabel;
+    return headerTitle;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-    return HEADER_HEIGHT;
-}
-
-/*------------------------> TABLE ROW CONTENTS <------------------------*/
+#pragma mark Table view content
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -132,11 +117,11 @@
     switch (section) {
         // Sheets
         case 0:
-            rowsInSection = 4;
+            rowsInSection = 11;
             break;
         // Reporting
         case 1:
-            rowsInSection = 9;
+            rowsInSection = 4;
             break;
         // General
         case 2:
@@ -161,10 +146,50 @@
              *cellLabelString = @"";
     
     // Configure the cell...
-    switch ([indexPath indexAtPosition:0]) {
-        // Sheets
+    switch (indexPath.section) {
+        // Reporting
         case 0:
-            switch ([indexPath indexAtPosition:1]) {
+            switch (indexPath.row) {
+                case 0:
+                    cellLabelString = @"Report a project";
+                    break;
+                case 1:
+                    cellLabelString = @"Reflect on service";
+                    break;
+                case 2:
+                    cellLabelString = @"Withdraw from a project";
+                    break;
+                case 3:
+                    cellLabelString = @"Create a fellowship";
+                    break;
+                case 4:
+                    cellLabelString = @"Report your fellowship";
+                    break;
+                case 5:
+                    cellLabelString = @"Give a (de-)merit";
+                    break;
+                case 6:
+                    cellLabelString = @"Report big-little hangout";
+                    break;
+                case 7:
+                    cellLabelString = @"Report your food group";
+                    break;
+                case 8:
+                    cellLabelString = @"Send a shoutout";
+                    break;
+                case 9:
+                    cellLabelString = @"Request a reimbursement";
+                    break;
+                case 10:
+                    cellLabelString = @"Tell Board";
+                    break;
+                default:
+                    break;
+            }
+            break;
+        // Sheets
+        case 1:
+            switch (indexPath.row) {
                 case 0:
                     cellLabelString = @"Brotherhood";
                     break;
@@ -181,43 +206,9 @@
                     break;
             }
             break;
-        // Reporting
-        case 1:
-            switch ([indexPath indexAtPosition:1]) {
-                case 0:
-                    cellLabelString = @"Service Reporting";
-                    break;
-                case 1:
-                    cellLabelString = @"Fellowship Service Reflection";
-                    break;
-                case 2:
-                    cellLabelString = @"Fellowship Hosting";
-                    break;
-                case 3:
-                    cellLabelString = @"Fellowship Reporting";
-                    break;
-                case 4:
-                    cellLabelString = @"Merit/Demerit";
-                    break;
-                case 5:
-                    cellLabelString = @"Big-Little";
-                    break;
-                case 6:
-                    cellLabelString = @"Food Groups";
-                    break;
-                case 7:
-                    cellLabelString = @"Study Groups";
-                    break;
-                case 8:
-                    cellLabelString = @"Reimbursements";
-                    break;
-                default:
-                    break;
-            }
-            break;
         // General
         case 2:
-            switch ([indexPath indexAtPosition:1]) {
+            switch (indexPath.row) {
                 case 0:
                     cellLabelString = @"National Website";
                     break;
@@ -236,7 +227,7 @@
             break;
         // Social Media
         case 3:
-            switch ([indexPath indexAtPosition:1]) {
+            switch (indexPath.row) {
                 case 0:
                     cellLabelString = @"Facebook Page";
                     break;
@@ -278,10 +269,49 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *urlToOpen;
-    switch ([indexPath indexAtPosition:0]) {
-        // Sheets
+    switch (indexPath.section) {
+        // Reporting
         case 0:
-            switch ([indexPath indexAtPosition:1]) {
+            switch (indexPath.row) {
+                case 0:
+                    urlToOpen = SERVICE_RPRT_FORM_URL;
+                    break;
+                case 1:
+                    urlToOpen = SERVICE_REFL_FORM_URL;
+                    break;
+                case 2:
+                    urlToOpen = SERVICE_WITHDRAW_FORM_URL;
+                    break;
+                case 3:
+                    urlToOpen = FELLOWS_HOST_FORM_URL;
+                    break;
+                case 4:
+                    urlToOpen = FELLOWS_RPRT_FORM_URL;
+                    break;
+                case 5:
+                    urlToOpen = MERIT_DEMERIT_RPRT_FORM_URL;
+                    break;
+                case 6:
+                    urlToOpen = BIGLITL_RPRT_FORM_URL;
+                    break;
+                case 7:
+                    urlToOpen = FOODGRP_RPRT_FORM_URL;
+                    break;
+                case 8:
+                    urlToOpen = SHOUTOUT_FORM_URL;
+                    break;
+                case 9:
+                    urlToOpen = REIMBURSE_RPRT_FORM_URL;
+                    break;
+                case 10:
+                    urlToOpen = BOARD_FEEDBACK_URL;
+                    break;
+            }
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlToOpen]];
+            break;
+        // Sheets
+        case 1:
+            switch (indexPath.row) {
                 case 0:
                     urlToOpen = BROTHR_SHT_URL;
                     break;
@@ -297,44 +327,11 @@
                 default:
                     break;
             }
-            [BookmarksViewController openGoogleDocWithUrlString:urlToOpen];
+            [self.class openGoogleDocWithUrlString:urlToOpen];
             break;
-        // Reporting
-        case 1:
-            switch ([indexPath indexAtPosition:1]) {
-                case 0:
-                    urlToOpen = SERVICE_RPRT_FORM_URL;
-                    break;
-                case 1:
-                    urlToOpen = SERVICE_REFL_FORM_URL;
-                    break;
-                case 2:
-                    urlToOpen = FELLOWS_HOST_FORM_URL;
-                    break;
-                case 3:
-                    urlToOpen = FELLOWS_RPRT_FORM_URL;
-                    break;
-                case 4:
-                    urlToOpen = MERIT_DEMERIT_RPRT_FORM_URL;
-                    break;
-                case 5:
-                    urlToOpen = BIGLITL_RPRT_FORM_URL;
-                    break;
-                case 6:
-                    urlToOpen = FOODGRP_RPRT_FORM_URL;
-                    break;
-                case 7:
-                    urlToOpen = STDYGRP_RPRT_FORM_URL;
-                    break;
-                case 8:
-                    urlToOpen = REIMBURSE_RPRT_FORM_URL;
-                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlToOpen]];
-                    break;
-            }
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlToOpen]];            break;
         // General
         case 2:
-            switch ([indexPath indexAtPosition:1]) {
+            switch (indexPath.row) {
                 case 0:
                     urlToOpen = NATIONAL_SITE_URL;
                     break;
@@ -342,9 +339,6 @@
                     urlToOpen = CHAPTER_SITE_URL;
                     break;
                 case 2:
-                    urlToOpen = BOARD_FEEDBACK_URL;
-                    break;
-                case 3:
                     urlToOpen = SERVICE_FORUM_URL;
                     break;
                 default:
@@ -354,7 +348,7 @@
             break;
         // Social Media
         case 3:
-            switch ([indexPath indexAtPosition:1]) {
+            switch (indexPath.row) {
                 case 0:
                     [BookmarksViewController openFbPage];
                     break;
@@ -383,7 +377,7 @@
             break;
         // ERRORS
         default:
-            NSLog(@"Bookmarks log: uncaught case in didSelectRowAtIndexPath");
+            NSLog(@"BookmarksController: uncaught case in didSelectRowAtIndexPath");
             break;
     }
 }

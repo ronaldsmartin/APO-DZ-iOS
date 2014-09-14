@@ -53,7 +53,7 @@
 - (void)loadCalendar
 {
     [_calendarWebView setDelegate:self];
-    [[_calendarWebView scrollView] setScrollEnabled:NO];
+    [[_calendarWebView scrollView] setScrollEnabled:YES];
     
     // Get the URL for the calendar with the appropriate window size.
     CGSize windowSize = _calendarWebView.frame.size;

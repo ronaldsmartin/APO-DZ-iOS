@@ -11,6 +11,8 @@
 #import <FacebookSDK/FBLoginView.h>
 #import <FacebookSDK/FBProfilePictureView.h>
 
+#define RgbUIColor(r, g, b)  [UIColor colorWithRed:((r) / 255.0) green:((g) / 255.0) blue:((b) / 255.0) alpha:1.0]
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -18,6 +20,15 @@
     // Override point for customization after application launch.
     [FBLoginView class];
     [FBProfilePictureView class];
+    
+    NSShadow *shadow = [[NSShadow alloc] init];
+    shadow.shadowColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.8];
+    shadow.shadowOffset = CGSizeMake(0, 1);
+    [[UINavigationBar appearance] setTitleTextAttributes:@{
+        NSForegroundColorAttributeName: RgbUIColor(245, 245, 245),
+                 NSShadowAttributeName: shadow,
+                   NSFontAttributeName: [UIFont fontWithName:@"Futura-CondensedExtraBold" size:20]
+        }];
     return YES;
 }
 

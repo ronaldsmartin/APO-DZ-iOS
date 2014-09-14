@@ -10,7 +10,10 @@
 
 @interface Directory : NSObject
 
+@property (nonatomic, strong) NSArray *alumniDirectory;
 @property (nonatomic, strong) NSArray *brotherDirectory;
 @property (nonatomic, strong) NSArray *pledgeDirectory;
+
+- (void)refreshDirectories;
 
 @end

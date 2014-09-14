@@ -12,10 +12,10 @@
 
 extern NSString *APP_PASSWORD;
 
-extern NSString *DIRECTORY_BROTHERS_JSON;
-extern NSString *DIRECTORY_PLEDGE_JSON;
+extern NSString *DIRECTORY_SCRIPT;
 extern NSString *BROTHER_DATA_JSON;
 extern NSString *CALENDAR_DEFAULT;
++ (NSString *)brotherScriptUrlWithFirstName:(NSString *)firstName lastName:(NSString *)lastName;
 + (NSString *)calendarUrlWithHeightString:(NSString *)height WidthString:(NSString *)width;
 + (NSString *)calendarUrlWithHeightFloat:(CGFloat)height widthFloat:(CGFloat)width;
 
@@ -30,12 +30,14 @@ extern NSString *FD_GRP_SHT_URL;
 // Forms
 extern NSString *SERVICE_RPRT_FORM_URL;
 extern NSString *SERVICE_REFL_FORM_URL;
+extern NSString *SERVICE_WITHDRAW_FORM_URL;
 extern NSString *FELLOWS_HOST_FORM_URL;
 extern NSString *FELLOWS_RPRT_FORM_URL;
 extern NSString *STDYGRP_RPRT_FORM_URL;
 extern NSString *FOODGRP_RPRT_FORM_URL;
 extern NSString *BIGLITL_RPRT_FORM_URL;
 extern NSString *MERIT_DEMERIT_RPRT_FORM_URL;
+extern NSString *SHOUTOUT_FORM_URL;
 extern NSString *REIMBURSE_RPRT_FORM_URL;
 
 // Sites

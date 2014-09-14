@@ -1,4 +1,4 @@
-![App Logo](https://lh5.ggpht.com/jGpGyqO6Vv7ogvVqh4JkyORugt8fXeedBv6R1WAdsiHB7N_JGgB4KNHSoYPbt4xDzg=w55) APO-DZ for iOS
+![App Logo](https://raw.githubusercontent.com/ronaldsmartin/APO-DZ-iOS/master/APO-DZ/Images.xcassets/AppIcon.appiconset/Icon-Small@2x.png) APO-DZ for iOS
 ==================
 The APO app was built as a native mobile interface so that brothers could quickly check their service hour progress, report and create events on the public calendars, and (most helpfully, so we hear) easily find and contact other members of our chapter. The backend lives in the Google cloud; databases are in Google Sheets with access via Google Forms, and multiple calendars are hosted on Google Calendar.
 
@@ -15,6 +15,7 @@ For more info on this version, check out [app webpage for the Android version](h
 
 ## Running It
 After downloading or forking, you'll need to:
+
 1. add the [Facebook SDK for iOS](https://developers.facebook.com/docs/ios/) to your frameworks and finish setting it up.
 2. make your own backend for the app
 3. create a file URLs.m that implement the required Strings in URLs.h
@@ -26,7 +27,7 @@ For app-related queries, feel free to contact us at developer@upennapo.org.
 
 ## Dependencies and Credits
 * [Facebook SDK](https://developers.facebook.com/docs/ios/)
-* Icons by Iconbeast - http://www.iconbeast.com/
+* Tab Icons by Iconbeast - http://www.iconbeast.com/
 
 Thank you to Tiff Lu for making the app icon.
 
